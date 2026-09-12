@@ -1,0 +1,23 @@
+# Build outputs
+/out/
+/build/
+/.gradle/
+*.class
+
+# Downloaded libraries
+/lib/
+
+# Keep the gradle wrapper jar but ignore other jars
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# Environment variables
+.env
