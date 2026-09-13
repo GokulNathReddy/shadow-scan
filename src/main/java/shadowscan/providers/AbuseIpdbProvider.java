@@ -25,7 +25,8 @@ import java.util.concurrent.CompletableFuture;
  * The UI labels this "IP Reputation" (not "IP Leak Check") to accurately
  * reflect what the data means.
  *
- * Endpoint: GET https://api.abuseipdb.com/api/v2/check?ipAddress={ip}&maxAgeInDays=90
+ * Endpoint: GET
+ * https://api.abuseipdb.com/api/v2/check?ipAddress={ip}&maxAgeInDays=90
  * Auth: API key via "Key" header, read from ABUSEIPDB_KEY environment variable.
  * NEVER hardcode the API key in source code.
  */
@@ -114,25 +115,24 @@ public class AbuseIpdbProvider implements BreachProvider {
 
                 JsonObject data = root.getAsJsonObject("data");
 
-                int abuseScore = data.has("abuseConfidenceScore") ?
-                        data.get("abuseConfidenceScore").getAsInt() : 0;
-                int totalReports = data.has("totalReports") ?
-                        data.get("totalReports").getAsInt() : 0;
-                String countryCode = data.has("countryCode") && !data.get("countryCode").isJsonNull() ?
-                        data.get("countryCode").getAsString() : "N/A";
-                String isp = data.has("isp") && !data.get("isp").isJsonNull() ?
-                        data.get("isp").getAsString() : "N/A";
-                String domain = data.has("domain") && !data.get("domain").isJsonNull() ?
-                        data.get("domain").getAsString() : "N/A";
-                String usageType = data.has("usageType") && !data.get("usageType").isJsonNull() ?
-                        data.get("usageType").getAsString() : "N/A";
+                int abuseScore = data.has("abuseConfidenceScore") ? data.get("abuseConfidenceScore").getAsInt() : 0;
+                int totalReports = data.has("totalReports") ? data.get("totalReports").getAsInt() : 0;
+                String countryCode = data.has("countryCode") && !data.get("countryCode").isJsonNull()
+                        ? data.get("countryCode").getAsString()
+                        : "N/A";
+                String isp = data.has("isp") && !data.get("isp").isJsonNull() ? data.get("isp").getAsString() : "N/A";
+                String domain = data.has("domain") && !data.get("domain").isJsonNull()
+                        ? data.get("domain").getAsString()
+                        : "N/A";
+                String usageType = data.has("usageType") && !data.get("usageType").isJsonNull()
+                        ? data.get("usageType").getAsString()
+                        : "N/A";
                 boolean isTor = data.has("isTor") && data.get("isTor").getAsBoolean();
                 boolean isWhitelisted = data.has("isWhitelisted") &&
                         !data.get("isWhitelisted").isJsonNull() &&
                         data.get("isWhitelisted").getAsBoolean();
                 String lastReportedAt = data.has("lastReportedAt") &&
-                        !data.get("lastReportedAt").isJsonNull() ?
-                        data.get("lastReportedAt").getAsString() : "Never";
+                        !data.get("lastReportedAt").isJsonNull() ? data.get("lastReportedAt").getAsString() : "Never";
 
                 RiskLevel level = RiskScorer.scoreIpReputation(abuseScore, totalReports);
 

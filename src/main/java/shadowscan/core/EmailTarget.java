@@ -8,10 +8,14 @@ public class EmailTarget implements ScanTarget {
     private final String email;
 
     public EmailTarget(String email) {
-        if (email == null || !email.matches("^[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
-            throw new IllegalArgumentException("Invalid email format: " + email);
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
         }
-        this.email = email.trim().toLowerCase();
+        String trimmed = email.trim().toLowerCase();
+        if (!trimmed.matches("^[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            throw new IllegalArgumentException("Invalid email format: " + trimmed);
+        }
+        this.email = trimmed;
     }
 
     @Override

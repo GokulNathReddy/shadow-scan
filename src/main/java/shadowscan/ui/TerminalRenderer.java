@@ -48,12 +48,12 @@ public class TerminalRenderer {
         System.out.println();
 
         String[] miniLogo = {
-            "   ░██████╗██╗  ██╗ █████╗ ██████╗  ██████╗ ██╗    ██╗",
-            "   ██╔════╝██║  ██║██╔══██╗██╔══██╗██╔═══██╗██║    ██║",
-            "   ╚█████╗ ███████║███████║██║  ██║██║   ██║██║ █╗ ██║",
-            "   ░╚═══██╗██╔══██║██╔══██║██║  ██║██║   ██║██║███╗██║",
-            "   ██████╔╝██║  ██║██║  ██║██████╔╝╚██████╔╝╚███╔███╔╝",
-            "   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝  ╚══╝╚══╝ "
+            "   ███████╗██╗  ██╗ █████╗ ██████╗  ██████╗ ██╗    ██╗   ███████╗ ██████╗ █████╗ ███╗   ██╗",
+            "   ██╔════╝██║  ██║██╔══██╗██╔══██╗██╔═══██╗██║    ██║   ██╔════╝██╔════╝██╔══██╗████╗  ██║",
+            "   ███████╗███████║███████║██║  ██║██║   ██║██║ █╗ ██║   ███████╗██║     ███████║██╔██╗ ██║",
+            "   ╚════██║██╔══██║██╔══██║██║  ██║██║   ██║██║███╗██║   ╚════██║██║     ██╔══██║██║╚██╗██║",
+            "   ███████║██║  ██║██║  ██║██████╔╝╚██████╔╝╚███╔███╔╝   ███████║╚██████╗██║  ██║██║ ╚████║",
+            "   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝  ╚══╝╚══╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝"
         };
 
         for (String line : miniLogo) {
@@ -69,6 +69,7 @@ public class TerminalRenderer {
         renderMenuItem("3", "Username Exposure Check", "Search for a username across breach sources");
         renderMenuItem("4", "Phone Number Exposure Check", "Search for a phone number in breach databases");
         renderMenuItem("5", "IP Reputation Check", "Check an IP address for abuse reports");
+        renderMenuItem("6", "Domain Threat Intelligence", "Check a domain for malicious indicators in OTX");
 
         System.out.println();
         System.out.println(AnsiPainter.horizontalRule(TERM_WIDTH));
@@ -99,8 +100,17 @@ public class TerminalRenderer {
     }
 
     public void renderInputPrompt(String prompt) {
-        System.out.print("  " + AnsiPainter.colorize(prompt, AnsiPainter.CYAN) + " "
-                + AnsiPainter.NEON_GREEN + "▸ " + AnsiPainter.RESET);
+        System.out.print("  ");
+        System.out.print(AnsiPainter.CYAN);
+        for (char c : prompt.toCharArray()) {
+            System.out.print(c);
+            try {
+                Thread.sleep(25); // Hacker typing speed
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        System.out.print(" " + AnsiPainter.NEON_GREEN + "▸ " + AnsiPainter.RESET);
     }
 
     // ─── Results ───────────────────────────────────────────────────────
@@ -180,10 +190,7 @@ public class TerminalRenderer {
     }
 
     public void renderGoodbye() {
-        System.out.println();
-        System.out.println("  " + AnsiPainter.boldColor("▸ Session terminated.", AnsiPainter.NEON_GREEN));
-        System.out.println("  " + AnsiPainter.colorize("Thank you for using ShadowScan.", AnsiPainter.DIM_GRAY));
-        System.out.println();
+        new shadowscan.ui.animations.ShutdownAnimation().play("shutdown");
     }
 
     public void renderPasswordDisclaimer() {

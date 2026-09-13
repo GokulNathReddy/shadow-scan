@@ -109,9 +109,29 @@ public class LeakCheckProvider implements BreachProvider {
                         return ScanResult.error(getProviderName(), rootObj.get("error").getAsString());
                     }
 
-                    // Check for "result" array wrapper
+                    // Check for "result" array wrapper (old API format)
                     if (rootObj.has("result") && rootObj.get("result").isJsonArray()) {
                         parseResultArray(rootObj.getAsJsonArray("result"), sources, fields);
+                    }
+                    
+                    // Check for "sources" and "fields" arrays at root (new API format)
+                    if (rootObj.has("sources") && rootObj.get("sources").isJsonArray()) {
+                        for (JsonElement el : rootObj.getAsJsonArray("sources")) {
+                            if (el.isJsonObject() && el.getAsJsonObject().has("name")) {
+                                String sourceName = el.getAsJsonObject().get("name").getAsString();
+                                if (!sources.contains(sourceName)) {
+                                    sources.add(sourceName);
+                                }
+                            }
+                        }
+                    }
+                    if (rootObj.has("fields") && rootObj.get("fields").isJsonArray()) {
+                        for (JsonElement el : rootObj.getAsJsonArray("fields")) {
+                            String fieldName = el.getAsString();
+                            if (!fields.contains(fieldName)) {
+                                fields.add(fieldName);
+                            }
+                        }
                     }
                 } else if (rootElement.isJsonArray()) {
                     parseResultArray(rootElement.getAsJsonArray(), sources, fields);

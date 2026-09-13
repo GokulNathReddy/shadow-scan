@@ -22,7 +22,7 @@ if (-not (Test-Path "lib\gson-2.11.0.jar")) {
 Write-Host "Compiling source files..."
 $sources = Get-ChildItem -Path "src\main\java" -Filter "*.java" -Recurse | Select-Object -ExpandProperty FullName
 $classpath = "lib\*"
-javac -d out -cp $classpath $sources
+javac -encoding UTF-8 -d out -cp $classpath $sources
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Build successful. Run with .\run.ps1" -ForegroundColor Green

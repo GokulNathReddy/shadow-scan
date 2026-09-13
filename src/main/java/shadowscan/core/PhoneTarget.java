@@ -9,11 +9,15 @@ public class PhoneTarget implements ScanTarget {
     private final String phone;
 
     public PhoneTarget(String phone) {
-        if (phone == null || phone.trim().isEmpty()) {
-            throw new IllegalArgumentException("Phone number cannot be empty.");
+        if (phone == null) {
+            throw new IllegalArgumentException("Phone number cannot be null.");
         }
-        // Strip spaces/dashes, keep + prefix and digits
-        this.phone = phone.trim().replaceAll("[\\s\\-()]", "");
+        // Strip spaces, dashes, parens, and plus signs
+        String cleaned = phone.trim().replaceAll("[\\s\\-()+]", "");
+        if (cleaned.isEmpty() || !cleaned.matches("^\\d+$")) {
+            throw new IllegalArgumentException("Invalid phone number format: " + phone);
+        }
+        this.phone = cleaned;
     }
 
     @Override

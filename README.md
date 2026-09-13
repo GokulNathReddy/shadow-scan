@@ -17,12 +17,16 @@ ShadowScan provides 5 lookup modules, each backed by a real free API:
 | **Username Exposure Check** | LeakCheck Public API | No |
 | **Phone Number Exposure Check** | LeakCheck Public API | No |
 | **IP Reputation Check** | AbuseIPDB | Yes (free key) |
+| **Domain Threat Intelligence** | AlienVault OTX | No |
 
 ### Terminal Aesthetic
 - Matrix rain intro animation
 - Typewriter boot sequence with ASCII banner
+- "Hacker-speed" typewriter input prompts
+- Matrix encryption/decryption processing sequences
 - Randomized scanning spinners (braille, radar sweep, glitch progress)
 - Letter-by-letter result reveals with glitch effects on critical findings
+- Cinematic shutdown disconnect sequences
 - Animated menu transitions
 - Persistent status header bar
 
@@ -51,6 +55,14 @@ cd ShadowScan
 ```
 
 *(If you are on an older Java version like Java 21, you can also use `./gradlew run`)*
+
+### Testing & CI/CD
+ShadowScan uses JUnit 5 for rigorous validation.
+You can run the entire test suite locally using the included script:
+```powershell
+.\test.ps1
+```
+*(ShadowScan also includes a GitHub Actions workflow for automatic CI/CD validation on every push!)*
 
 ### API Key Setup (for IP Reputation module)
 
@@ -83,7 +95,8 @@ BreachProvider (interface)
 ├── XposedOrNotProvider        → Email breach checking
 ├── XposedOrNotPasswordProvider → Password k-anonymity checking
 ├── LeakCheckProvider          → Username + Phone lookups
-└── AbuseIpdbProvider          → IP reputation checking
+├── AbuseIpdbProvider          → IP reputation checking
+└── AlienVaultDomainProvider   → Domain OSINT & Pulses
 ```
 
 **Why Strategy?** New data sources can be added by implementing `BreachProvider` and registering with the `ScanEngine` — zero changes to existing code. The engine selects the right provider at runtime via `supports(ScanTarget)`.
@@ -133,7 +146,8 @@ shadowscan/
 │   ├── XposedOrNotProvider.java       # Email breach + analytics
 │   ├── XposedOrNotPasswordProvider.java # Keccak-512 + k-anonymity
 │   ├── LeakCheckProvider.java         # Username + Phone
-│   └── AbuseIpdbProvider.java         # IP reputation
+│   ├── AbuseIpdbProvider.java         # IP reputation
+│   └── AlienVaultDomainProvider.java  # Domain threat intelligence
 └── ui/
     ├── AnsiPainter.java               # ANSI escape code helper
     ├── TerminalRenderer.java          # All visual output
@@ -147,7 +161,9 @@ shadowscan/
         ├── GlitchProgressAnimation.java
         ├── ResultRevealAnimation.java
         ├── DataStreamAnimation.java
-        └── MenuWipeAnimation.java
+        ├── MenuWipeAnimation.java
+        ├── MatrixProcessingAnimation.java
+        └── ShutdownAnimation.java
 ```
 
 ---

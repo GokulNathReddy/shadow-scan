@@ -39,6 +39,7 @@ public class ShadowScan {
         engine.registerProvider(new XposedOrNotPasswordProvider(engine.getHttpClient()));
         engine.registerProvider(new LeakCheckProvider(engine.getHttpClient()));
         engine.registerProvider(new AbuseIpdbProvider(engine.getHttpClient()));
+        engine.registerProvider(new AlienVaultDomainProvider(engine.getHttpClient()));
     }
 
     public void run() {
@@ -69,13 +70,14 @@ public class ShadowScan {
                 case "3": handleUsernameScan(); break;
                 case "4": handlePhoneScan(); break;
                 case "5": handleIpScan(); break;
+                case "6": handleDomainScan(); break;
                 case "0":
                 case "exit":
                 case "quit":
                     running = false;
                     break;
                 default:
-                    renderer.renderError("Invalid option. Please select 0-5.");
+                    renderer.renderError("Invalid option. Please select 0-6.");
                     pause();
                     break;
             }
@@ -164,9 +166,28 @@ public class ShadowScan {
         }
     }
 
+    private void handleDomainScan() {
+        renderer.renderModuleHeader("Domain Threat Intelligence");
+        renderer.renderInputPrompt("Enter domain name:");
+        String input = readLine();
+        if (input == null || input.trim().isEmpty()) return;
+
+        try {
+            ScanTarget target = new DomainTarget(input.trim());
+            executeScan(target);
+        } catch (IllegalArgumentException e) {
+            renderer.renderError(e.getMessage());
+            pause();
+        }
+    }
+
     // ─── Scan Execution with Animation ─────────────────────────────────
 
     private void executeScan(ScanTarget target) {
+        System.out.println();
+
+        // New matrix encryption effect right after user submits
+        new shadowscan.ui.animations.MatrixProcessingAnimation().play(target.getValue());
         System.out.println();
 
         // Start the async scan
