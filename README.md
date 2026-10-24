@@ -1,194 +1,131 @@
-# ShadowScan — Terminal Breach Intelligence Tool
+# ShadowScan — Breach Intelligence Console
 
-A personal breach/exposure intelligence CLI tool with a hacker-terminal aesthetic, built in Java with clean OOP design principles.
+A desktop app that checks whether your email, passwords, usernames, phone numbers, IPs or domains have shown up in known data breaches and threat-intelligence feeds. Built with **Python + Tkinter** and a dark "cyber console" look.
 
-![Java](https://img.shields.io/badge/Java-11%2B-orange) ![License](https://img.shields.io/badge/License-Educational-blue)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue) ![GUI](https://img.shields.io/badge/GUI-Tkinter-green) ![Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)
 
 ---
 
 ## Features
 
-ShadowScan provides 5 lookup modules, each backed by a real free API:
+| Module | What it checks | Data source | API key |
+|---|---|---|---|
+| ✉ **Email Breach Check** | Breaches containing the email, exposed data types, breach timeline | XposedOrNot | No |
+| ✱ **Password Exposure** | How many times a password appears in leaked dumps (k-anonymity) | XposedOrNot | No |
+| ☺ **Username Exposure** | Breach sources containing the username | LeakCheck | No |
+| ☎ **Phone Exposure** | Breach sources containing the phone number | LeakCheck | No |
+| ⌖ **IP Reputation** | Abuse reports (spam, brute-force, scanning), ISP, Tor exit | AbuseIPDB | Yes (free) |
+| ◎ **Domain Threat Intel** | Threat pulses, linked malware families / threat actors | AlienVault OTX | No |
 
-| Module | API | Auth Required |
-|--------|-----|---------------|
-| **Email Breach Check** | XposedOrNot | No |
-| **Password Exposure Check** | XposedOrNot (k-anonymity) | No |
-| **Username Exposure Check** | LeakCheck Public API | No |
-| **Phone Number Exposure Check** | LeakCheck Public API | No |
-| **IP Reputation Check** | AbuseIPDB | Yes (free key) |
-| **Domain Threat Intelligence** | AlienVault OTX | No |
+### Interface highlights
+- **Boot sequence**: matrix "digital rain" with a typewriter terminal intro (press any key to skip)
+- **Threat radar**: an animated sweep with blips and pings while a scan runs
+- **Threat gauge**: the radar turns into a 0–100 threat-score gauge colour-coded by verdict
+- **Decrypting findings**: result lines appear as scrambled glyphs, then "decrypt" into text
+- **Live password strength meter**: entropy and estimated crack time, calculated offline as you type
+- **Activity log**: a timestamped console showing each request the app makes
+- **Scan history**: verdict summary tiles, a results table, and export to **.txt** or **.json**
+- **Diagnostics**: AbuseIPDB key setup, live provider health check with latency, and an **offline demo mode**
+- **About page**: a diagram of how the k-anonymity password check works
 
-### Terminal Aesthetic
-- Matrix rain intro animation
-- Typewriter boot sequence with ASCII banner
-- "Hacker-speed" typewriter input prompts
-- Matrix encryption/decryption processing sequences
-- Randomized scanning spinners (braille, radar sweep, glitch progress)
-- Letter-by-letter result reveals with glitch effects on critical findings
-- Cinematic shutdown disconnect sequences
-- Animated menu transitions
-- Persistent status header bar
-
-**No run looks identical to the last one** — animations are randomly selected from a pool.
-
----
-
-## Quick Start
-
-### Prerequisites
-- **Java 11+** (tested with Java 25)
-- Internet connection for API calls
-
-### Build & Run
-
-Since Gradle currently lacks full support for Java 25, convenient PowerShell scripts are provided for direct compilation.
-
-```powershell
-cd ShadowScan
-
-# Download dependencies and compile
-.\build.ps1
-
-# Run the application
-.\run.ps1
-```
-
-*(If you are on an older Java version like Java 21, you can also use `./gradlew run`)*
-
-### Testing & CI/CD
-ShadowScan uses JUnit 5 for rigorous validation.
-You can run the entire test suite locally using the included script:
-```powershell
-.\test.ps1
-```
-*(ShadowScan also includes a GitHub Actions workflow for automatic CI/CD validation on every push!)*
-
-### API Key Setup (for IP Reputation module)
-
-1. Sign up for a free API key at [AbuseIPDB](https://www.abuseipdb.com/account/api)
-2. Set the environment variable:
-   ```bash
-   # Linux/Mac
-   export ABUSEIPDB_KEY=your_api_key_here
-
-   # Windows (CMD)
-   set ABUSEIPDB_KEY=your_api_key_here
-
-   # Windows (PowerShell)
-   $env:ABUSEIPDB_KEY = "your_api_key_here"
-   ```
-3. Run ShadowScan — the IP Reputation module will now work
-
-> The other 4 modules work without any API key.
+### Verdicts
+`SAFE` → `CAUTION` → `EXPOSED` → `CRITICAL` (plus `ERROR` when a lookup fails). Each module has its own thresholds, because a "breach count" and an "abuse confidence %" mean different things.
 
 ---
 
-## OOP Design Decisions
+## Quick start
 
-### Strategy Pattern (BreachProvider)
+Requirements: **Python 3.10+**, which includes Tkinter on Windows and macOS. There are no packages to install.
 
-The core architectural pattern is **Strategy**. Each API integration implements the `BreachProvider` interface:
-
-```
-BreachProvider (interface)
-├── XposedOrNotProvider        → Email breach checking
-├── XposedOrNotPasswordProvider → Password k-anonymity checking
-├── LeakCheckProvider          → Username + Phone lookups
-├── AbuseIpdbProvider          → IP reputation checking
-└── AlienVaultDomainProvider   → Domain OSINT & Pulses
+```bash
+python main.py              # with boot animation
+python main.py --no-splash  # skip straight to the console
+# or
+python -m shadowscan
 ```
 
-**Why Strategy?** New data sources can be added by implementing `BreachProvider` and registering with the `ScanEngine` — zero changes to existing code. The engine selects the right provider at runtime via `supports(ScanTarget)`.
+> On Linux you may need the Tk package: `sudo apt install python3-tk`
 
-### Interface Boundaries
+### Optional: AbuseIPDB key (IP Reputation only)
+1. Get a free key at <https://www.abuseipdb.com/account/api>.
+2. In the app, open **Diagnostics**, paste the key and click **Save**. It is stored in a local `.env` file, which git ignores.
 
-```
-ScanTarget (interface)          → What to scan (email, password, etc.)
-BreachProvider (interface)      → How to scan (which API, what parsing)
-ScanResult (model)              → Normalized result regardless of source
-RiskScorer (utility)            → Raw data → Safe/Caution/Exposed/Critical
-TerminalRenderer                → ALL visual output (fully separated from logic)
-ScanAnimation (interface)       → Pluggable animation implementations
-```
+   You can also copy `.env.example` to `.env` and fill in the key, or set the `ABUSEIPDB_KEY` environment variable.
 
-**Key boundary**: `TerminalRenderer` owns every `System.out.print` call. The logic layer (providers, engine, scorer) never prints directly. This means the entire API integration layer is testable without a terminal.
+### Presenting without internet?
+Turn on **Diagnostics → Offline Demo Mode**. Every module then returns results from a built-in sample dataset. These results are deterministic and clearly labelled `[DEMO]`.
 
-### k-Anonymity (Password Module)
-
-The password module implements the **k-anonymity model**:
-1. Password is hashed locally with SHA3 Keccak-512 (via Bouncy Castle)
-2. Only the first 10 hex characters of the hash are sent to the API
-3. The full password and full hash **never leave the client**
-4. This is enforced at the code level — the full hash exists only as a local variable in `computeKeccak512Prefix()` and is never stored, returned, or transmitted
+### Keyboard shortcuts
+| Keys | Action |
+|---|---|
+| `Ctrl+1` … `Ctrl+6` | Switch scan module |
+| `Enter` | Run scan |
+| `Esc` | Clear input |
+| `Ctrl+H` / `Ctrl+D` | History / Diagnostics |
 
 ---
 
-## Package Structure
+## How the password check stays private
 
 ```
-shadowscan/
-├── ShadowScan.java                    # Main entry point
-├── core/
-│   ├── ScanTarget.java                # Interface — polymorphic scan target
-│   ├── EmailTarget.java               # Email with format validation
-│   ├── PasswordTarget.java            # Password (hashed locally, never sent)
-│   ├── UsernameTarget.java            # Username
-│   ├── PhoneTarget.java               # Phone number with normalization
-│   ├── IpTarget.java                  # IP with v4/v6 validation
-│   ├── BreachProvider.java            # Strategy pattern interface
-│   ├── RiskScorer.java                # Risk classification logic
-│   └── ScanEngine.java                # Orchestrator
-├── model/
-│   ├── ScanResult.java                # Normalized result (Builder pattern)
-│   └── RiskLevel.java                 # Enum: SAFE/CAUTION/EXPOSED/CRITICAL
-├── providers/
-│   ├── XposedOrNotProvider.java       # Email breach + analytics
-│   ├── XposedOrNotPasswordProvider.java # Keccak-512 + k-anonymity
-│   ├── LeakCheckProvider.java         # Username + Phone
-│   ├── AbuseIpdbProvider.java         # IP reputation
-│   └── AlienVaultDomainProvider.java  # Domain threat intelligence
-└── ui/
-    ├── AnsiPainter.java               # ANSI escape code helper
-    ├── TerminalRenderer.java          # All visual output
-    ├── ScanAnimation.java             # Animation interface
-    ├── AnimationPool.java             # Random picker (no repeats)
-    └── animations/
-        ├── MatrixRainAnimation.java
-        ├── TypewriterBootAnimation.java
-        ├── BrailleSpinnerAnimation.java
-        ├── RadarSpinnerAnimation.java
-        ├── GlitchProgressAnimation.java
-        ├── ResultRevealAnimation.java
-        ├── DataStreamAnimation.java
-        ├── MenuWipeAnimation.java
-        ├── MatrixProcessingAnimation.java
-        └── ShutdownAnimation.java
+"hunter2" ──► Keccak-512 (on your PC) ──► first 10 hex chars ──►  API
+                128 hex characters          e.g. "a3f9c1e07b"     returns counts
+└──────────── never leaves your computer ────────────┘
 ```
 
----
+Thousands of different passwords share the same 10-character prefix, so the server cannot tell which password you typed. This is called **k-anonymity**. The password field is also cleared as soon as a scan starts.
 
-## Dependencies
-
-| Dependency | Purpose | Maven Coordinates |
-|------------|---------|-------------------|
-| **Bouncy Castle** | Keccak-512 hashing for password k-anonymity | `org.bouncycastle:bcprov-jdk18on:1.78.1` |
-| **Gson** | JSON parsing for API responses | `com.google.code.gson:gson:2.11.0` |
-| **java.net.http** | HTTP client (built-in, Java 11+) | — |
+Keccak-512 (the original Keccak, *not* `hashlib.sha3_512`, which uses different padding) is implemented from scratch in [`shadowscan/keccak.py`](shadowscan/keccak.py). It is checked against `hashlib`'s SHA-3, which uses the same permutation, in the unit tests.
 
 ---
 
-## API Rate Limits
+## Project structure
 
-| API | Rate Limit | Daily Limit |
-|-----|------------|-------------|
-| XposedOrNot (email) | 2/sec | 100/day |
-| XposedOrNot (password) | No published limit | — |
-| LeakCheck (public) | 1/sec | — |
-| AbuseIPDB (free tier) | — | 1000/day |
+```
+ShadowScan/
+├── main.py                     # entry point
+├── shadowscan/
+│   ├── models.py               # RiskLevel enum, ScanResult dataclass
+│   ├── targets.py              # ScanTarget + 6 validating subclasses, make_target() factory
+│   ├── scoring.py              # per-module risk thresholds
+│   ├── engine.py               # ScanEngine - routes a target to the right provider
+│   ├── keccak.py               # pure-Python Keccak-512
+│   ├── strength.py             # offline password entropy / crack-time estimator
+│   ├── net.py                  # tiny urllib JSON client + ping
+│   ├── config.py               # .env loading / saving
+│   ├── providers/
+│   │   ├── base.py             # BreachProvider abstract base (template method)
+│   │   ├── xposedornot.py      # email + password
+│   │   ├── leakcheck.py        # username + phone
+│   │   ├── abuseipdb.py        # IP reputation
+│   │   ├── alienvault.py       # domain threat intel
+│   │   └── demo.py             # offline demo dataset
+│   └── gui/
+│       ├── app.py              # main window, pages, scan workflow
+│       ├── widgets.py          # radar/gauge, matrix rain, buttons, toggle, meters
+│       ├── splash.py           # boot animation
+│       └── theme.py            # colours, fonts, DPI scaling
+└── tests/test_core.py          # 29 unit tests (no network needed)
+```
+
+### Design decisions
+- **Strategy pattern**: every API is a `BreachProvider` subclass. `ScanEngine` picks the provider that `supports()` the target, so adding a new data source does not touch any UI code.
+- **Template method**: `BreachProvider.scan()` handles timeouts, network errors and unexpected failures in one place. Subclasses implement only `_scan()`, which parses their own API's response.
+- **Polymorphic targets**: each `ScanTarget` subclass validates and normalises its own input. For example, `DomainTarget` accepts a pasted URL and `PhoneTarget` strips formatting. `PasswordTarget` masks itself in `display` and `repr`.
+- **Responsive UI**: scans run on a worker thread and send log lines and results back through a `queue.Queue`, which the Tk main loop polls. The window never freezes.
+- **Core is separate from GUI**: everything outside `gui/` works without Tkinter and is fully unit-tested with mocked HTTP.
 
 ---
 
-## License
+## Running the tests
 
-Educational project — built for an Advanced Programming Practice course. APIs used under their respective free-tier terms.
+```bash
+python -m unittest discover tests -v
+```
+
+GitHub Actions runs the suite on Windows and Ubuntu with Python 3.10, 3.12 and 3.13 on every push.
+
+---
+
+## Disclaimer
+For **educational and personal use only**. Check only accounts, IPs and domains that you own or are authorised to assess. ShadowScan shows breach *metadata* only (source names, dates, data categories). It never retrieves leaked data itself.

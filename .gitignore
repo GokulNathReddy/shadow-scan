@@ -1,23 +1,19 @@
-# Build outputs
-/out/
-/build/
-/.gradle/
-*.class
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
 
-# Downloaded libraries
-/lib/
-
-# Keep the gradle wrapper jar but ignore other jars
-*.jar
-!gradle/wrapper/gradle-wrapper.jar
+# Exported reports
+shadowscan-report-*.txt
+shadowscan-report-*.json
 
 # IDE files
 .idea/
-*.iml
 .vscode/
-.project
-.classpath
-.settings/
 
-# Environment variables
+# Environment variables (API keys)
 .env

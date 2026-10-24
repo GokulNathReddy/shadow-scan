@@ -1,0 +1,2 @@
+# ShadowScan uses only the Python standard library (Python 3.10+ with Tkinter).
+# Nothing to install - run:  python main.py
